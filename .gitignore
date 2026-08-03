@@ -1,0 +1,14 @@
+OTNOC_*.txt
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Excel temporaires
+~$*.xlsx
+
+# Editeurs
+.vscode/
+.idea/
+*.swp
