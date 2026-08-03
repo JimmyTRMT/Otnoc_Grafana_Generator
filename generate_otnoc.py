@@ -352,7 +352,7 @@ def build_txt(config, otnoc_list) -> str:
     panel_title = str(config["panel_title"]).strip()
 
     header = (
-        f"OTNOC - Configuration Grafana générée automatiquement\n"
+        f"OTNOC - \n"
         f"Site         : {site_name}\n"
         f"Titre panel  : {panel_title}\n"
         f"Nb d'OTNOC   : {len(otnoc_list)}\n"
@@ -360,7 +360,7 @@ def build_txt(config, otnoc_list) -> str:
         f"|   Hauteur: {TABLE_HEIGHT_PX} px\n"
         f"\n"
         f"Coller chaque bloc ci-dessous dans la zone correspondante du panel\n"
-        f"Grafana (type 'Business HTML Graphics'). Aucun autre réglage requis.\n"
+        f"Grafana. Aucun autre réglage requis.\n"
     )
 
     parts = [
