@@ -31,6 +31,14 @@ génération à partir d'un simple fichier Excel.
    - CSS
    - onRender
 
+Le fichier contient en plus une **variante de Query A**, à n'utiliser que si la
+requête principale échoue avec `error occurred while preparing the query ...
+INSQL`. C'est le cas quand les tags du site contiennent des points
+(ex. `AU_MEM_F1.AU1.PVFL`) : le provider INSQL ne sait pas les résoudre comme
+colonnes de `WideHistory`. La variante lit la table `History` (les tags y sont
+de simples chaînes) et fait le pivot côté SQL Server ; le résultat envoyé au
+panel est identique, les autres blocs ne changent pas.
+
 ## Paramètres fixes
 
 Modifiables en haut de `generate_otnoc.py` :
