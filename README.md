@@ -25,11 +25,21 @@ génération à partir d'un simple fichier Excel.
 ```
    python generate_otnoc.py
 ```
-5. Le script produit `OTNOC_<site>.txt` avec les 4 blocs à coller dans Grafana :
+5. Le script produit `OTNOC_<site>.txt` avec les blocs à coller dans Grafana :
    - Query A (SQL Server)
    - HTML/SVG document
    - CSS
-   - onRender
+   - onRender, en **deux versions** : une pour le booléen, une pour
+     l'incrémentation. N'en coller qu'une, celle qui correspond au codage du
+     site.
+
+Le fichier contient en plus une **variante de Query A**, à n'utiliser que si la
+requête principale échoue avec `error occurred while preparing the query ...
+INSQL`. C'est le cas quand les tags du site contiennent des points
+(ex. `AU_MEM_F1.AU1.PVFL`) : le provider INSQL ne sait pas les résoudre comme
+colonnes de `WideHistory`. La variante lit la table `History` (les tags y sont
+de simples chaînes) et fait le pivot côté SQL Server ; le résultat envoyé au
+panel est identique, les autres blocs ne changent pas.
 
 ## Paramètres fixes
 
@@ -54,3 +64,16 @@ Modifiables en haut de `generate_otnoc.py` :
 |-----------------------|--------|-----------------------------|
 | 3BREF100_DEF_OTNOC1   | 1      | Arrêt séquence alimenteur   |
 | ...                   | ...    | ...                         |
+
+## Codage de la valeur
+
+Selon le site, un défaut se lit de deux façons :
+
+- **booléen** : 0 = pas de défaut, 1 = défaut actif (Sète)
+- **incrémentation** : la valeur est un compteur qui avance à chaque occurrence
+  (Saint-Saulve)
+
+D'où les deux blocs onRender : coller celui qui correspond, jamais les deux. Un
+codage inadapté ne provoque **aucune erreur**, juste un tableau vide — voir
+[NOTE_TECHNIQUE.md](NOTE_TECHNIQUE.md) pour l'ensemble des différences entre
+sites.

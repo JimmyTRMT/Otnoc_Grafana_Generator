@@ -1,4 +1,5 @@
 OTNOC_*.txt
+_diagnostic_tags.sql
 
 # Python
 __pycache__/
