@@ -74,6 +74,6 @@ Selon le site, un défaut se lit de deux façons :
   (Saint-Saulve)
 
 D'où les deux blocs onRender : coller celui qui correspond, jamais les deux. Un
-codage inadapté ne provoque **aucune erreur**, juste un tableau vide — voir
+codage inadapté ne provoque **aucune erreur**, juste un tableau vide, voir
 [NOTE_TECHNIQUE.md](NOTE_TECHNIQUE.md) pour l'ensemble des différences entre
 sites.
