@@ -63,7 +63,7 @@ pas.
 
 ## 3. Axe de variation n°2 - le codage de la valeur
 
-Deuxième différence, invisible celle-là : la requête fonctionne, mais **le
+Deuxième différence: la requête fonctionne, mais **le
 tableau reste vide sans aucune erreur**.
 
 | Codage dans l'automate | Site connu | Ce qu'affiche le tableau |
@@ -109,8 +109,7 @@ Cette règle couvre les deux usages sans avoir à les distinguer à l'avance.
 | Numéros en double | non | **oui** : les 12 `AU_MEM_*` sont numérotés 1 à 12, comme les 12 premiers OTNOC |
 
 Le n° OTNOC n'est **qu'un libellé affiché** : il ne sert pas de clé et n'a aucune
-influence sur les requêtes. C'est pour cela que le contrôle « numéro OTNOC en
-double » a été retiré du générateur : deux familles de tags peuvent légitimement
+influence sur les requêtes. Deux familles de tags peuvent légitimement
 partager la même numérotation. En revanche le **tag reste unique** et le contrôle
 correspondant est maintenu — c'est lui qui sert de clé entre le SQL et le
 JavaScript.
@@ -156,7 +155,7 @@ panel — tableau vide — mais n'ont pas le même remède :
 | Tableau vide, **aucune erreur** | codage inadapté (compteur traité en booléen) | coller l'autre bloc onRender |
 | Ligne « Tag Inconnu (...) » dans le tableau | un tag remonte du SQL mais est absent du dictionnaire onRender | recoller le bloc onRender après régénération |
 
-Le dernier cas mérite attention : **Query A et onRender doivent toujours venir de
+**Query A et onRender doivent toujours venir de
 la même génération.** Le SQL décide des tags remontés, le onRender contient leur
 libellé, leur numéro et leur mode. Si on ne recolle que l'un des deux, le panel
 n'affiche pas d'erreur — il affiche des lignes fausses ou rien.
