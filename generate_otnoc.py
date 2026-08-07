@@ -250,7 +250,98 @@ def build_css() -> str:
 """
 
 
-def build_onrender(site_name: str, otnoc_list) -> str:
+DETECTION_BOOL = """function calculateStateChanges(dateArray, valueArray) {
+    const stateChanges = [];
+    if (valueArray.length === 0) return stateChanges;
+
+    var currentState = valueArray[0];
+    var startDate = dateArray[0];
+
+    for (var i = 1; i < valueArray.length; i++) {
+        const currentDate = dateArray[i];
+        const currentValue = valueArray[i];
+        if (currentValue === null) continue;
+
+        if (currentValue !== currentState) {
+            if (currentDate > startDate) {
+                stateChanges.push({
+                    state: currentState,
+                    startDate: startDate,
+                    endDate: currentDate
+                });
+            }
+            currentState = currentValue;
+            startDate = currentDate;
+        }
+    }
+    return stateChanges;
+}
+
+var final_array = [];
+var dates = valueField[0].values;
+
+for (var y = 1; y < valueField_size; y++) {
+    const stateData = valueField[y].values;
+    const tagName = valueField[y].name;
+    const stateDurations = calculateStateChanges(dates, stateData);
+
+    stateDurations.forEach(d => {
+        if (d.state === 1) {
+            final_array.push([d.startDate, d.endDate, tagName]);
+        }
+    });
+}
+
+"""
+
+DETECTION_INCREMENT = """function calculateIncrements(dateArray, valueArray) {
+    const increments = [];
+    var previousValue = null;
+    var startDate = null;
+    var lastDate = null;
+
+    for (var i = 0; i < valueArray.length; i++) {
+        const currentValue = valueArray[i];
+        if (currentValue === null) continue;
+
+        const value = Number(currentValue);
+        if (previousValue === null) {
+            previousValue = value;
+            continue;
+        }
+
+        if (value > previousValue) {
+            if (startDate === null) startDate = dateArray[i];
+            lastDate = dateArray[i];
+        } else if (startDate !== null) {
+            increments.push({ startDate: startDate, endDate: lastDate });
+            startDate = null;
+        }
+        previousValue = value;
+    }
+
+    if (startDate !== null) increments.push({ startDate: startDate, endDate: lastDate });
+    return increments;
+}
+
+var final_array = [];
+var dates = valueField[0].values;
+
+for (var y = 1; y < valueField_size; y++) {
+    const counterData = valueField[y].values;
+    const tagName = valueField[y].name;
+    const occurrences = calculateIncrements(dates, counterData);
+
+    occurrences.forEach(d => {
+        final_array.push([d.startDate, d.endDate, tagName]);
+    });
+}
+
+"""
+
+
+def build_onrender(site_name: str, otnoc_list, mode: str) -> str:
+    """Bloc onRender. Un mode = un bloc, avec sa seule logique de détection."""
     dict_lines = []
     for o in otnoc_list:
         text_escaped = o["text"].replace("\\", "\\\\").replace('"', '\\"')
@@ -259,6 +350,7 @@ def build_onrender(site_name: str, otnoc_list) -> str:
             f'text: "{text_escaped}" }},'
         )
     dict_body = "\n".join(dict_lines)
+    detection = DETECTION_INCREMENT if mode == "increment" else DETECTION_BOOL
 
     return f"""console.clear();
 
@@ -313,48 +405,7 @@ function timeConverter(t) {{
     return [date_date, "", date_hour];
 }}
 
-function calculateStateChanges(dateArray, valueArray) {{
-    const stateChanges = [];
-    if (valueArray.length === 0) return stateChanges;
-
-    var currentState = valueArray[0];
-    var startDate = dateArray[0];
-
-    for (var i = 1; i < valueArray.length; i++) {{
-        const currentDate = dateArray[i];
-        const currentValue = valueArray[i];
-        if (currentValue === null) continue;
-
-        if (currentValue !== currentState) {{
-            if (currentDate > startDate) {{
-                stateChanges.push({{
-                    state: currentState,
-                    startDate: startDate,
-                    endDate: currentDate
-                }});
-            }}
-            currentState = currentValue;
-            startDate = currentDate;
-        }}
-    }}
-    return stateChanges;
-}}
-
-var final_array = [];
-var dates = valueField[0].values;
-
-for (var y = 1; y < valueField_size; y++) {{
-    const stateData = valueField[y].values;
-    const tagName = valueField[y].name;
-    const stateDurations = calculateStateChanges(dates, stateData);
-
-    stateDurations.forEach(d => {{
-        if (d.state === 1) {{
-            final_array.push([d.startDate, d.endDate, tagName]);
-        }}
-    }});
-}}
-
+{detection}
 final_array.sort((a, b) => b[0] - a[0]);
 
 var tableau = htmlNode.getElementById("content");
@@ -427,6 +478,12 @@ def build_txt(config, otnoc_list) -> str:
         f"\n"
         f"Coller chaque bloc ci-dessous dans la zone correspondante du panel\n"
         f"Grafana. Aucun autre réglage requis.\n"
+        f"\n"
+        f"ATTENTION : il y a DEUX blocs onRender, un par codage de la valeur.\n"
+        f"N'en coller qu'UN SEUL, celui qui correspond au site :\n"
+        f"  - POUR LE BOOLEEN       : 0 = pas de défaut, 1 = défaut actif.\n"
+        f"  - POUR L'INCREMENTATION : la valeur est un compteur qui avance à\n"
+        f"                            chaque occurrence.\n"
     )
 
     parts = [
@@ -443,8 +500,18 @@ def build_txt(config, otnoc_list) -> str:
         build_html(),
         section("À mettre dans CSS"),
         build_css(),
-        section("À mettre dans onRender"),
-        build_onrender(site_name, otnoc_list),
+        section(
+            "À mettre dans onRender - VERSION 1/2 : POUR LE BOOLEEN\n"
+            "0 = pas de défaut, 1 = défaut actif.\n"
+            "Ne coller que ce bloc OU le suivant, jamais les deux."
+        ),
+        build_onrender(site_name, otnoc_list, "bool"),
+        section(
+            "À mettre dans onRender - VERSION 2/2 : POUR L'INCREMENTATION\n"
+            "La valeur est un compteur qui avance à chaque occurrence.\n"
+            "Ne coller que ce bloc OU le précédent, jamais les deux."
+        ),
+        build_onrender(site_name, otnoc_list, "increment"),
     ]
     return "".join(parts)
 
