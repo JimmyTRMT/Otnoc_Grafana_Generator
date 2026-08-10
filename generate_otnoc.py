@@ -160,7 +160,7 @@ SET @openQuery = N'
         FROM OPENQUERY({LINKED_SERVER}, N''' + REPLACE(@query, '''', '''''') + N''')
     ) AS src
     PIVOT (MAX(Value) FOR TagName IN ({columns})) AS pvt
-    ORDER BY DateTime DESC
+    ORDER BY DateTime ASC
 '
 
 EXEC(@openQuery)
