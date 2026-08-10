@@ -69,9 +69,8 @@ Modifiables en haut de `generate_otnoc.py` :
 
 Selon le site, un défaut se lit de deux façons :
 
-- **booléen** : 0 = pas de défaut, 1 = défaut actif (Sète)
+- **booléen** : 0 = pas de défaut, 1 = défaut actif
 - **incrémentation** : la valeur est un compteur qui avance à chaque occurrence
-  (Saint-Saulve)
 
 D'où les deux blocs onRender : coller celui qui correspond, jamais les deux. Un
 codage inadapté ne provoque **aucune erreur**, juste un tableau vide, voir
