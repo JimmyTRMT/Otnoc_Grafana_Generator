@@ -111,7 +111,7 @@ Cette règle couvre les deux usages sans avoir à les distinguer à l'avance.
 Le n° OTNOC n'est **qu'un libellé affiché** : il ne sert pas de clé et n'a aucune
 influence sur les requêtes. Deux familles de tags peuvent légitimement
 partager la même numérotation. En revanche le **tag reste unique** et le contrôle
-correspondant est maintenu — c'est lui qui sert de clé entre le SQL et le
+correspondant est maintenu, c'est lui qui sert de clé entre le SQL et le
 JavaScript.
 
 ---
