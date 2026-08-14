@@ -64,12 +64,15 @@ def read_config(xlsx_path: Path):
             )
         tag = str(tag).strip()
         text = str(text).strip()
-        try:
+        # 'number' est libre : entier, code alphanumérique, texte...
+        # On normalise juste l'affichage des nombres Excel (3.0 -> 3).
+        if isinstance(number, float) and number.is_integer():
             number = int(number)
-        except (TypeError, ValueError):
+        number = str(number).strip()
+        if not number:
             sys.exit(
-                f"[ERREUR] Ligne {row_idx} : 'number' doit être un entier "
-                f"(reçu {number!r})."
+                f"[ERREUR] Ligne {row_idx} de 'OTNOC' incomplète "
+                f"(tag={tag!r}, number={number!r}, text={text!r})."
             )
         if any(o["tag"] == tag for o in otnoc_list):
             sys.exit(f"[ERREUR] Tag en double : {tag}")
@@ -160,7 +163,7 @@ SET @openQuery = N'
         FROM OPENQUERY({LINKED_SERVER}, N''' + REPLACE(@query, '''', '''''') + N''')
     ) AS src
     PIVOT (MAX(Value) FOR TagName IN ({columns})) AS pvt
-    ORDER BY DateTime DESC
+    ORDER BY DateTime ASC
 '
 
 EXEC(@openQuery)
@@ -345,8 +348,9 @@ def build_onrender(site_name: str, otnoc_list, mode: str) -> str:
     dict_lines = []
     for o in otnoc_list:
         text_escaped = o["text"].replace("\\", "\\\\").replace('"', '\\"')
+        number_escaped = o["number"].replace("\\", "\\\\").replace('"', '\\"')
         dict_lines.append(
-            f'    "{o["tag"]}": {{ number: {o["number"]}, '
+            f'    "{o["tag"]}": {{ number: "{number_escaped}", '
             f'text: "{text_escaped}" }},'
         )
     dict_body = "\n".join(dict_lines)
@@ -539,7 +543,12 @@ def main():
     print(f"     Site           : {config['site_name']}")
     print(f"     Panel          : {config['panel_title']}")
     print(f"     OTNOC          : {len(otnoc_list)} défaut(s)")
-    print(f"     Numéros        : {sorted(o['number'] for o in otnoc_list)}")
+    # Tri « naturel » : les numéros purement numériques d'abord, puis le reste.
+    def _num_key(n):
+        return (0, int(n), "") if n.lstrip("-").isdigit() else (1, 0, n)
+
+    numeros = sorted((o["number"] for o in otnoc_list), key=_num_key)
+    print(f"     Numéros        : {numeros}")
 
 
 if __name__ == "__main__":

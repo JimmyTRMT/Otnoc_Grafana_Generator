@@ -63,7 +63,7 @@ pas.
 
 ## 3. Axe de variation n°2 - le codage de la valeur
 
-Deuxième différence : la requête fonctionne, mais **le
+Deuxième différence: la requête fonctionne, mais **le
 tableau reste vide sans aucune erreur**.
 
 | Codage dans l'automate | Site connu | Ce qu'affiche le tableau |
