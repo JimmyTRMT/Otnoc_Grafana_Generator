@@ -13,4 +13,5 @@ __pycache__/
 # Editeurs
 .vscode/
 .idea/
-*.swp.claude/
+*.swp
+.claude/
