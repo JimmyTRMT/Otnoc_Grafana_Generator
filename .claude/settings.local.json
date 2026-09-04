@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python -c \"import ast,sys; ast.parse\\(open\\('generate_otnoc.py',encoding='utf-8'\\).read\\(\\)\\)\")"
-    ]
-  }
-}
